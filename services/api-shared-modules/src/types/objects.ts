@@ -1,4 +1,7 @@
-export type UserType = 'Voter' | 'Admin';
+export enum UserType {
+	VOTER = 'VOTER',
+	ADMIN = 'ADMIN'
+}
 
 export interface DBItem {
 	pk: string;
@@ -27,7 +30,7 @@ export interface User extends DBItem {
 		confirmedAt?: string;
 		createdAt: string;
 		lastLogin?: string;
-	}
+	};
 }
 
 export interface Candidate extends DBItem, CandidateDetails {
@@ -39,7 +42,7 @@ export interface Candidate extends DBItem, CandidateDetails {
 	times: {
 		createdAt: string;
 		updatedAt?: string;
-	}
+	};
 }
 
 export interface BallotPaper extends DBItem {
@@ -51,11 +54,12 @@ export interface BallotPaper extends DBItem {
 	times: {
 		createdAt: string;
 		submittedVoteAt?: string;
-	}
+	};
 }
 
 export interface Election extends DBItem {
 	electionId: string;
+	electionName: string;
 	createdBy: {
 		userId: string;
 		firstName: string;

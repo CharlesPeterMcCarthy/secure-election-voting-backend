@@ -8,6 +8,9 @@ export class ElectionItem extends DynamoDbItem implements Election {
 	public electionId!: string;
 
 	@attribute()
+	public electionName!: string;
+
+	@attribute()
 	public createdBy!: {
 		userId: string;
 		firstName: string;
