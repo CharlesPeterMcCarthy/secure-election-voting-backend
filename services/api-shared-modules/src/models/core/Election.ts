@@ -23,8 +23,8 @@ export class ElectionItem extends DynamoDbItem implements Election {
 	@attribute()
 	public times: {
 		createdAt: string;
-		startedAt: string;
-		endedAt: string;
+		startedAt?: string;
+		endedAt?: string;
 	};
 
 }

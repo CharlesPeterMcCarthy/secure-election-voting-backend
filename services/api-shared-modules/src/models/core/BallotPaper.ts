@@ -19,7 +19,7 @@ export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 	@attribute()
 	public times: {
 		createdAt: string;
-		submittedVoteAt: string;
+		submittedVoteAt?: string;
 	};
 
 }

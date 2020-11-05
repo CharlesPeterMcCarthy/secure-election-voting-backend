@@ -49,7 +49,7 @@ export interface BallotPaper extends DBItem {
 	vote?: CandidateDetails;
 	times: {
 		createdAt: string;
-		submittedVoteAt: string;
+		submittedVoteAt?: string;
 	}
 }
 
@@ -64,7 +64,7 @@ export interface Election extends DBItem {
 	winner?: CandidateDetails;
 	times: {
 		createdAt: string;
-		startedAt: string;
-		endedAt: string;
+		startedAt?: string;
+		endedAt?: string;
 	}
 }
