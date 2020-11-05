@@ -1,5 +1,8 @@
 import { BaseFunctionExpressionPredicate, BetweenExpressionPredicate, BinaryComparisonPredicate, ConditionExpression } from '@aws/dynamodb-expressions';
 
+export { IBallotPaperRepository } from './IBallotPaperRepository';
+export { ICandidateRepository } from './ICandidateRepository';
+export { IElectionRepository } from './IElectionRepository';
 export { IUserRepository } from './IUserRepository';
 
 export interface QueryKey {

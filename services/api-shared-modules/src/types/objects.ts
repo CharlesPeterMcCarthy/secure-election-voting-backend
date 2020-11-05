@@ -43,10 +43,11 @@ export interface Candidate extends DBItem, CandidateDetails {
 }
 
 export interface BallotPaper extends DBItem {
-	ballotId: string;
+	ballotPaperId: string;
 	userId: string;
 	candidates: CandidateDetails[];
 	vote?: CandidateDetails;
+	voteCandidateId?: string;
 	times: {
 		createdAt: string;
 		submittedVoteAt?: string;

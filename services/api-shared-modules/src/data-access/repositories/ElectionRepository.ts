@@ -1,9 +1,8 @@
 import { QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
-import { QueryKey } from '../interfaces';
+import { QueryKey, IElectionRepository } from '../interfaces';
 import { Election, LastEvaluatedKey } from '../../types';
 import { Repository } from './Repository';
 import { v4 as uuid } from 'uuid';
-import { IElectionRepository } from '../interfaces/IElectionRepository';
 import { ElectionItem } from '../../models/core/Election';
 
 export class ElectionRepository extends Repository implements IElectionRepository {

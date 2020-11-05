@@ -5,7 +5,7 @@ import { BallotPaper, CandidateDetails } from '../../types';
 export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 
 	@attribute()
-	public ballotId!: string;
+	public ballotPaperId!: string;
 
 	@attribute()
 	public userId!: string;
@@ -15,6 +15,9 @@ export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 
 	@attribute()
 	public vote?: CandidateDetails;
+
+	@attribute()
+	public voteCandidateId?: string;
 
 	@attribute()
 	public times: {

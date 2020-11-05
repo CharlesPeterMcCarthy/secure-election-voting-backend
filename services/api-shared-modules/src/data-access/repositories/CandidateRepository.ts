@@ -1,7 +1,6 @@
 import { QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
-import { QueryKey } from '../interfaces';
+import { QueryKey, ICandidateRepository} from '../interfaces';
 import { Candidate, LastEvaluatedKey } from '../../types';
-import { ICandidateRepository } from '../interfaces/ICandidateRepository';
 import { Repository } from './Repository';
 import { CandidateItem } from '../../models/core/Candidate';
 import { v4 as uuid } from 'uuid';
