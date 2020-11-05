@@ -22,11 +22,12 @@ export class ElectionController {
 
 		const electionId: string = event.pathParameters.electionId;
 
-		const election: Election = await this.unitOfWork.Elections.get(electionId);
-
 		try {
+			const election: Election = await this.unitOfWork.Elections.get(electionId);
+
 			return ResponseBuilder.ok({ election });
 		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Election not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -76,6 +77,7 @@ export class ElectionController {
 
 		// if (!data.adminId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Admin details are missing');
 		if (!data.election) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election Details are missing');
+		if (!data.election.electionId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election ID is missing');
 
 		const updatedElection: Election = data.election;
 

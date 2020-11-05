@@ -41,7 +41,7 @@ functions:
     handler: src/handler.getElectionById
     events:
       - http:
-          path: /election/{electionId]
+          path: /election/{electionId}
           method: get
           cors: true
   getAllElections:
@@ -69,6 +69,6 @@ functions:
     handler: src/handler.deleteElection
     events:
       - http:
-          path: /election
+          path: /election/{electionId}
           method: delete
           cors: true
