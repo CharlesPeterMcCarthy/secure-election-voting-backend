@@ -17,8 +17,15 @@ export class CandidateItem extends DynamoDbItem implements Candidate {
 	public party!: string;
 
 	@attribute()
+	public createdBy!: {
+		userId: string;
+		firstName: string;
+		lastName: string;
+	};
+
+	@attribute()
 	public times: {
-		createdAt: Date | string;
+		createdAt: string;
 	};
 
 }

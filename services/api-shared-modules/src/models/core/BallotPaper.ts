@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { BallotPaper } from '../../types';
+import { BallotPaper, CandidateDetails } from '../../types';
 
 export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 
@@ -8,9 +8,18 @@ export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 	public ballotId!: string;
 
 	@attribute()
+	public userId!: string;
+
+	@attribute()
+	public candidates!: CandidateDetails[];
+
+	@attribute()
+	public vote?: CandidateDetails;
+
+	@attribute()
 	public times: {
-		createdAt: Date | string;
-		submittedVoteAt: Date | string;
+		createdAt: string;
+		submittedVoteAt: string;
 	};
 
 }

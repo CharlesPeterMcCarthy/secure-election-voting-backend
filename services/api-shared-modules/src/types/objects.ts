@@ -24,30 +24,45 @@ export interface User extends DBItem {
 	confirmed: boolean;
 	times: {
 		confirmedAt?: string;
-		createdAt: Date | string;
-		lastLogin?: Date | string;
+		createdAt: string;
+		lastLogin?: string;
 	}
 }
 
 export interface Candidate extends DBItem, CandidateDetails {
+	createdBy: {
+		userId: string;
+		firstName: string;
+		lastName: string;
+	};
 	times: {
-		createdAt: Date | string;
+		createdAt: string;
 	}
 }
 
 export interface BallotPaper extends DBItem {
 	ballotId: string;
+	userId: string;
+	candidates: CandidateDetails[];
+	vote?: CandidateDetails;
 	times: {
-		createdAt: Date | string;
-		submittedVoteAt: Date | string;
+		createdAt: string;
+		submittedVoteAt: string;
 	}
 }
 
-export interface Vote extends DBItem {
-	voteId: string;
-	ballotId: string;
-	candidate: CandidateDetails;
+export interface Election extends DBItem {
+	electionId: string;
+	createdBy: {
+		userId: string;
+		firstName: string;
+		lastName: string;
+	};
+	candidates: CandidateDetails[];
+	winner?: CandidateDetails;
 	times: {
-		createdAt: Date | string;
+		createdAt: string;
+		startedAt: string;
+		endedAt: string;
 	}
 }
