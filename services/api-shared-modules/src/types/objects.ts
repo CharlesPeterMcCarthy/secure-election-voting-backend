@@ -10,6 +10,7 @@ export interface DBItem {
 
 export interface CandidateDetails {
 	candidateId: string;
+	electionId: string;
 	firstName: string;
 	lastName: string;
 	party: string;
@@ -37,6 +38,7 @@ export interface Candidate extends DBItem, CandidateDetails {
 	};
 	times: {
 		createdAt: string;
+		updatedAt?: string;
 	}
 }
 

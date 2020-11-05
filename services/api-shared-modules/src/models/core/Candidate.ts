@@ -8,6 +8,9 @@ export class CandidateItem extends DynamoDbItem implements Candidate {
 	public candidateId!: string;
 
 	@attribute()
+	public electionId!: string;
+
+	@attribute()
 	public firstName!: string;
 
 	@attribute()
@@ -26,6 +29,7 @@ export class CandidateItem extends DynamoDbItem implements Candidate {
 	@attribute()
 	public times: {
 		createdAt: string;
+		updatedAt?: string;
 	};
 
 }
