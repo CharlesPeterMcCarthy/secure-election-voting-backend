@@ -36,4 +36,12 @@ export class UserController {
 		}
 	}
 
+	public test: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		try {
+			return ResponseBuilder.ok({ test: 'test' });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 }

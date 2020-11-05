@@ -1,7 +1,7 @@
 {
-  "name": "project-300",
+  "name": "election-vote",
   "version": "1.0.1",
-  "description": "Project 300 Serverless Websocket Backend",
+  "description": "Secure Election Vote Serverless Backend",
   "main": "src/connection.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

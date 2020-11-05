@@ -29,7 +29,6 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-        - cognito-idp:AdminCreateUser
       Resource:
         - '*'
 
@@ -44,4 +43,11 @@ functions:
       - http:
           path: /users/all
           method: put
+          cors: true
+  test:
+    handler: src/handler.test
+    events:
+      - http:
+          path: /test
+          method: get
           cors: true

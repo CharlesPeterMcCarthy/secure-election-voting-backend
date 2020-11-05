@@ -5,3 +5,4 @@ const unitOfWork: UnitOfWork = new UnitOfWork();
 const controller: UserController = new UserController(unitOfWork);
 
 export const getAllUsers: ApiHandler = controller.getAllUsers;
+export const test: ApiHandler = controller.test;
