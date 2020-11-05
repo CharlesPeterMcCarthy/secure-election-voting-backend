@@ -33,3 +33,12 @@ plugins:
 resources:
   - ${file(resources/dynamodb-tables.yml)}
   - ${file(resources/api-gateway.yml)}
+
+functions:
+  health:
+    handler: src/handler.health
+    events:
+      - http:
+          path: /health
+          method: get
+          cors: true
