@@ -6,7 +6,6 @@ import {
 	ApiEvent,
 	ApiContext,
 	UnitOfWork,
-	SharedFunctions,
 	UserItem,
 	LastEvaluatedKey,
 	User
@@ -32,52 +31,6 @@ export class UserController {
 			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Users');
 
 			return ResponseBuilder.ok({ ...result, count: result.users.length });
-		} catch (err) {
-			return ResponseBuilder.internalServerError(err, err.message);
-		}
-	}
-
-	public getUserById: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.pathParameters || !event.pathParameters.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
-		const userId: string = event.pathParameters.userId;
-
-		try {
-
-			const user: User = await this.unitOfWork.Users.getById(userId);
-			if (!user) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'User not found');
-
-			return ResponseBuilder.ok({ user });
-		} catch (err) {
-			return ResponseBuilder.internalServerError(err, err.message);
-		}
-	}
-
-	public updateUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
-
-		const user: Partial<User> = JSON.parse(event.body) as Partial<User>;
-
-		try {
-			const userId: string = SharedFunctions.getUserIdFromAuthProvider(event.requestContext.identity.cognitoAuthenticationProvider);
-			const result: User = await this.unitOfWork.Users.update(userId, { ...user });
-			if (!result) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'User not found');
-
-			return ResponseBuilder.ok({ user: result });
-		} catch (err) {
-			return ResponseBuilder.internalServerError(err, err.message);
-		}
-	}
-
-	public deleteUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.pathParameters || !event.pathParameters.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
-
-		const userId: string = event.pathParameters.userId;
-
-		try {
-			const user: User = await this.unitOfWork.Users.delete(userId);
-			if (!user) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'User not found');
-
-			return ResponseBuilder.ok({ user });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}

@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { User, UserConnection, UserType } from '../../types';
+import { User, UserType } from '../../types';
 
 export class UserItem extends DynamoDbItem implements User {
 
@@ -20,9 +20,6 @@ export class UserItem extends DynamoDbItem implements User {
 	public userType!: UserType;
 
 	@attribute()
-	public avatar?: string;
-
-	@attribute()
 	public confirmed!: boolean;
 
 	@attribute()
@@ -31,8 +28,5 @@ export class UserItem extends DynamoDbItem implements User {
 		createdAt: Date | string;
 		lastLogin?: Date | string;
 	};
-
-	@attribute()
-	public connections: UserConnection[];
 
 }

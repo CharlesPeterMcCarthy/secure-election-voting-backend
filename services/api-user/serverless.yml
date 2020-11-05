@@ -45,31 +45,3 @@ functions:
           path: /users/all
           method: put
           cors: true
-          authorizer: aws_iam
-  getUserById:
-    handler: src/handler.getUserById
-    events:
-      - http:
-          path: /users/{userId}
-          method: get
-          cors: true
-          authorizer: aws_iam
-  updateUser:
-    handler: src/handler.updateUser
-    events:
-      - http:
-          path: /users
-          method: put
-          cors: true
-          authorizer: aws_iam
-  deleteUser:
-    handler: src/handler.deleteUser
-    events:
-      - http:
-          path: /users/{userId}
-          method: delete
-          cors: true
-          authorizer: aws_iam
-
-resources:
-    - ${file(../resources/cognito-policy.yml)}

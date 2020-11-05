@@ -1,7 +1,6 @@
 import { BaseFunctionExpressionPredicate, BetweenExpressionPredicate, BinaryComparisonPredicate, ConditionExpression } from '@aws/dynamodb-expressions';
 
 export { IUserRepository } from './IUserRepository';
-export { ISubscriptionRepository } from './ISubscriptionRepository';
 
 export interface QueryKey {
 	pk?: string;
