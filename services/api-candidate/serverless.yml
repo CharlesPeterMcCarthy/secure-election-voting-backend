@@ -1,0 +1,81 @@
+service: api-election-service-${self:custom.projectName}
+frameworkVersion: ">=1.44.0"
+
+custom:
+  # Our stage is based on what is passed in when running serverless
+  # commands. Or falls back to what we have set in the provider section.
+  stage: ${opt:stage, self:provider.stage}
+  projectName: ${file(../../serverless.common.yml):custom.projectName}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: eu-west-1
+  environment:
+    tableName: ${file(../../serverless.common.yml):custom.generalTableName}
+  apiGateway:
+    restApiId:
+      'Fn::ImportValue': ${self:custom.stage}-${self:custom.projectName}-ApiGatewayRestApiId
+    restApiRootResourceId:
+      'Fn::ImportValue': ${self:custom.stage}-${self:custom.projectName}-ApiGatewayRestApiRootResourceId
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - '*'
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+
+functions:
+  getCandidateById:
+    handler: src/handler.getCandidateById
+    events:
+      - http:
+          path: /candidate/{candidateId}/{electionId}
+          method: get
+          cors: true
+  getAllCandidates:
+    handler: src/handler.getAllCandidates
+    events:
+      - http:
+          path: /candidate/all
+          method: get
+          cors: true
+  getAllCandidatesByElection:
+    handler: src/handler.getAllCandidatesByElection
+    events:
+      - http:
+          path: /candidate/all-by-election
+          method: get
+          cors: true
+  createCandidate:
+    handler: src/handler.createCandidate
+    events:
+      - http:
+          path: /candidate
+          method: post
+          cors: true
+  updateCandidate:
+    handler: src/handler.updateCandidate
+    events:
+      - http:
+          path: /candidate
+          method: put
+          cors: true
+  deleteCandidate:
+    handler: src/handler.deleteCandidate
+    events:
+      - http:
+          path: /candidate/{candidateId}/{electionId}
+          method: delete
+          cors: true
