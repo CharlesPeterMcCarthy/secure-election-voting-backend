@@ -4,5 +4,8 @@ import { UserController } from './user.controller';
 const unitOfWork: UnitOfWork = new UnitOfWork();
 const controller: UserController = new UserController(unitOfWork);
 
-export const getAllUsers: ApiHandler = controller.getAllUsers;
-export const test: ApiHandler = controller.test;
+export const getUser: ApiHandler = controller.getUser;
+export const getAllVoters: ApiHandler = controller.getAllVoters;
+export const createUser: ApiHandler = controller.createUser;
+export const updateUser: ApiHandler = controller.updateUser;
+export const deleteUser: ApiHandler = controller.deleteUser;

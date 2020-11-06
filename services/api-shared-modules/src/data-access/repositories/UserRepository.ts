@@ -1,42 +1,32 @@
 import { UserItem } from '../../models/core';
 import { QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
 import { Repository } from './Repository';
-import { QueryKey } from '../interfaces';
-import { LastEvaluatedKey, User } from '../../types';
+import { IUserRepository, QueryKey } from '../interfaces';
+import { LastEvaluatedKey, User, UserType } from '../../types';
+import { v4 as uuid } from 'uuid';
 
-export class UserRepository extends Repository {
+export class UserRepository extends Repository implements IUserRepository {
 
-	public async getAll(lastEvaluatedKey?: LastEvaluatedKey): Promise<{ users: User[]; lastEvaluatedKey: Partial<UserItem> }> {
-		// const predicate: MembershipExpressionPredicate = inList('User', 'Admin');
-		//
-		// const expression: ConditionExpression = {
-		// 	...predicate,
-		// 	subject: 'userType'
-		// };
-
+	public async getAllByUserType(userType: UserType, lastEvaluatedKey?: LastEvaluatedKey):
+		Promise<{ users: User[]; lastEvaluatedKey: Partial<UserItem> }> {
 		const keyCondition: QueryKey = {
-			entity: 'user'
+			entity: 'user',
+			sk2: `userType#${userType}`
 		};
 		const queryOptions: QueryOptions = {
 			indexName: 'entity-sk2-index',
 			scanIndexForward: false,
 			startKey: lastEvaluatedKey,
-			// filter: expression,
 			limit: 10
 		};
 
 		const queryPages: QueryPaginator<UserItem> = this.db.query(UserItem, keyCondition, queryOptions).pages();
 		const users: User[] = [];
-		for await (const page of queryPages) {
-			for (const user of page)
-				users.push(user);
-		}
+		for await (const page of queryPages) for (const user of page) users.push(user);
+
 		return {
 			users,
-			lastEvaluatedKey:
-				queryPages.lastEvaluatedKey ?
-					queryPages.lastEvaluatedKey :
-					undefined
+			lastEvaluatedKey: queryPages.lastEvaluatedKey ? queryPages.lastEvaluatedKey : undefined
 		};
 	}
 
@@ -47,30 +37,31 @@ export class UserRepository extends Repository {
 		}));
 	}
 
-	public async createAfterSignUp(userId: string, toCreate: Partial<User>): Promise<User> {
+	public async create(toCreate: Partial<User>): Promise<User> {
+		const userId: string = uuid();
 		const date: string = new Date().toISOString();
 
 		return this.db.put(Object.assign(new UserItem(), {
-			userId,
 			pk: `user#${userId}`,
 			sk: `user#${userId}`,
+			sk2: `userType#${toCreate.userType}`,
 			entity: 'user',
-			confirmed: false,
+			userId,
+			confirmed: true,
 			times: {
 				createdAt: date
 			},
-			connections: [],
 			...toCreate
 		}));
 	}
 
-	public async update(userId: string, changes: Partial<User>): Promise<User> {
+	public async update(changes: Partial<User>): Promise<User> {
 		delete changes.sk2;
 		delete changes.sk3;
 
 		return this.db.update(Object.assign(new UserItem(), {
-			pk: `user#${userId}`,
-			sk: `user#${userId}`,
+			pk: `user#${changes.userId}`,
+			sk: `user#${changes.userId}`,
 			...changes
 		}), {
 			onMissing: 'skip'

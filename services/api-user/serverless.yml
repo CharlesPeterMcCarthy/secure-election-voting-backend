@@ -37,17 +37,38 @@ plugins:
   - serverless-webpack
 
 functions:
-  getAllUsers:
-    handler: src/handler.getAllUsers
+  getUser:
+    handler: src/handler.getUser
     events:
       - http:
-          path: /users/all
+          path: /user/{userId}
+          method: get
+          cors: true
+  getAllVoters:
+    handler: src/handler.getAllVoters
+    events:
+      - http:
+          path: /user/voters
+          method: get
+          cors: true
+  createUser:
+    handler: src/handler.createUser
+    events:
+      - http:
+          path: /user
+          method: post
+          cors: true
+  updateUser:
+    handler: src/handler.updateUser
+    events:
+      - http:
+          path: /user
           method: put
           cors: true
-  test:
-    handler: src/handler.test
+  deleteUser:
+    handler: src/handler.deleteUser
     events:
       - http:
-          path: /test
-          method: get
+          path: /user/{userId}
+          method: delete
           cors: true
