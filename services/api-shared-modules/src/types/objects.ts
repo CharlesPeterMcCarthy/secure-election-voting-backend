@@ -47,6 +47,7 @@ export interface Candidate extends DBItem, CandidateDetails {
 
 export interface BallotPaper extends DBItem {
 	ballotPaperId: string;
+	electionId: string;
 	userId: string;
 	candidates: CandidateDetails[];
 	vote?: CandidateDetails;

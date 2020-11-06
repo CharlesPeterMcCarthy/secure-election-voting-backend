@@ -11,11 +11,33 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 	public async getAllByElection(electionId: string, lastEvaluatedKey?: LastEvaluatedKey):
 		Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }> {
 		const keyCondition: QueryKey = {
-			entity: 'candidate',
-			sk: `election#${electionId}`
+			entity: 'ballotPaper',
+			sk2: `election#${electionId}`
 		};
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index',
+			indexName: 'entity-sk2-index',
+			scanIndexForward: false,
+			startKey: lastEvaluatedKey,
+			limit: 10
+		};
+
+		const queryPages: QueryPaginator<BallotPaperItem> = this.db.query(BallotPaperItem, keyCondition, queryOptions).pages();
+		const ballotPapers: BallotPaper[] = [];
+		for await (const page of queryPages) for (const ballotPaper of page) ballotPapers.push(ballotPaper);
+		return {
+			ballotPapers,
+			lastEvaluatedKey: queryPages.lastEvaluatedKey ? queryPages.lastEvaluatedKey : undefined
+		};
+	}
+
+	public async getAllByElectionVoter(userId: string, electionId: string, lastEvaluatedKey?: LastEvaluatedKey):
+		Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }> {
+		const keyCondition: QueryKey = {
+			entity: 'ballotPaper',
+			sk3: `user#${userId}/election#${electionId}`,
+		};
+		const queryOptions: QueryOptions = {
+			indexName: 'entity-sk3-index',
 			scanIndexForward: false,
 			startKey: lastEvaluatedKey,
 			limit: 10
@@ -40,11 +62,11 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 		};
 
 		const keyCondition: QueryKey = {
-			entity: 'candidate',
-			sk: `election#${electionId}`
+			entity: 'ballotPaper',
+			sk2: `election#${electionId}`
 		};
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index',
+			indexName: 'entity-sk2-index',
 			scanIndexForward: false,
 			startKey: lastEvaluatedKey,
 			limit: 10,
@@ -76,6 +98,8 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 		return this.db.put(Object.assign(new BallotPaperItem(), {
 			pk: `ballotPaper#${ballotPaper.ballotPaperId}`,
 			sk: `user#${ballotPaper.userId}`,
+			sk2: `election#${ballotPaper.electionId}`,
+			sk3: `user#${ballotPaper.userId}/election#${ballotPaper.electionId}`,
 			entity: 'ballotPaper',
 			times: {
 				createdAt: date

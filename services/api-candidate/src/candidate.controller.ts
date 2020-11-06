@@ -27,7 +27,7 @@ export class CandidateController {
 
 			return ResponseBuilder.ok({ candidate });
 		} catch (err) {
-			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Election not found');
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Candidate not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

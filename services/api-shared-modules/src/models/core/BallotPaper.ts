@@ -8,6 +8,9 @@ export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 	public ballotPaperId!: string;
 
 	@attribute()
+	public electionId!: string;
+
+	@attribute()
 	public userId!: string;
 
 	@attribute()

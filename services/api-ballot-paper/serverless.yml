@@ -1,4 +1,4 @@
-service: api-candidate-service-${self:custom.projectName}
+service: api-ballot-service-${self:custom.projectName}
 frameworkVersion: ">=1.44.0"
 
 custom:
@@ -37,45 +37,38 @@ plugins:
   - serverless-webpack
 
 functions:
-  getCandidateById:
-    handler: src/handler.getCandidateById
+  getBallotPaperById:
+    handler: src/handler.getBallotPaperById
     events:
       - http:
-          path: /candidate/{candidateId}/{electionId}
+          path: /ballot/{ballotPaperId}/{userId}
           method: get
           cors: true
-  getAllCandidates:
-    handler: src/handler.getAllCandidates
+  getAllBallotPapersByElection:
+    handler: src/handler.getAllBallotPapersByElection
     events:
       - http:
-          path: /candidate/all
+          path: /ballot/election/{electionId}
           method: get
           cors: true
-  getAllCandidatesByElection:
-    handler: src/handler.getAllCandidatesByElection
+  getBallotsByElectionVoter:
+    handler: src/handler.getAllBallotPapersByElectionVoter
     events:
       - http:
-          path: /candidate/all-by-election/{electionId}
+          path: /ballot/voter/{electionId}/{userId}
           method: get
           cors: true
-  createCandidate:
-    handler: src/handler.createCandidate
+  getBallotsByCandidate:
+    handler: src/handler.getAllBallotPapersByCandidate
     events:
       - http:
-          path: /candidate
+          path: /ballot/candidate/{electionId}/{candidateId}
+          method: get
+          cors: true
+  createBallotPaper:
+    handler: src/handler.createBallotPaper
+    events:
+      - http:
+          path: /ballot
           method: post
-          cors: true
-  updateCandidate:
-    handler: src/handler.updateCandidate
-    events:
-      - http:
-          path: /candidate
-          method: put
-          cors: true
-  deleteCandidate:
-    handler: src/handler.deleteCandidate
-    events:
-      - http:
-          path: /candidate/{candidateId}/{electionId}
-          method: delete
           cors: true
