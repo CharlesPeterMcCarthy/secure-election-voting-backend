@@ -58,6 +58,13 @@ functions:
           path: /election/all-unregistered/{userId}
           method: get
           cors: true
+  getElecRegByUser:
+    handler: src/handler.getAllElectionsRegisteredByUser
+    events:
+      - http:
+          path: /election/all-registered/{userId}
+          method: get
+          cors: true
   registerForElection:
     handler: src/handler.registerForElection
     events:

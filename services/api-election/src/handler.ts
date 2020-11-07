@@ -7,6 +7,7 @@ const controller: ElectionController = new ElectionController(unitOfWork);
 export const getElectionById: ApiHandler = controller.getElectionById;
 export const getAllElections: ApiHandler = controller.getAllElections;
 export const getAllElectionsUnregisteredByUser: ApiHandler = controller.getAllElectionsUnregisteredByUser;
+export const getAllElectionsRegisteredByUser: ApiHandler = controller.getAllElectionsRegisteredByUser;
 export const registerForElection: ApiHandler = controller.registerForElection;
 export const createElection: ApiHandler = controller.createElection;
 export const updateElection: ApiHandler = controller.updateElection;

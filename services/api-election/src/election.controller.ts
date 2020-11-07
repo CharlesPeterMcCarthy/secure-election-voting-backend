@@ -67,6 +67,25 @@ export class ElectionController {
 		}
 	}
 
+	public getAllElectionsRegisteredByUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.userId)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - User ID is missing');
+
+		const userId: string = event.pathParameters.userId;
+
+		try {
+			const electionsResponse: { elections: Election[] } = await this.unitOfWork.Elections.getAll(false);
+			const ballotPapersResponse: { ballotPapers: BallotPaper[] } = await this.unitOfWork.BallotPapers.getAllByVoter(userId, false);
+			const ballotPaperElectionIds: string[] = ballotPapersResponse.ballotPapers.map((bp: BallotPaper) => bp.electionId);
+			const registeredElections: Election[] =
+				electionsResponse.elections.filter((e: Election) => ballotPaperElectionIds.includes(e.electionId));
+
+			return ResponseBuilder.ok({ elections: registeredElections });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public registerForElection: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
