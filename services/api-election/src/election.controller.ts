@@ -10,7 +10,8 @@ import {
 	Election, BallotPaper
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
-import { CreateElectionRequest, UpdateElectionRequest } from './election.interfaces';
+import {CreateElectionRequest, RegisterForElectionRequest, UpdateElectionRequest} from './election.interfaces';
+import {BallotPaperController} from "../../api-ballot-paper/src/ballot-paper.controller";
 
 export class ElectionController {
 
@@ -60,7 +61,25 @@ export class ElectionController {
 			const unregisteredElections: Election[] =
 				electionsResponse.elections.filter((e: Election) => !ballotPaperElectionIds.includes(e.electionId));
 
-			return ResponseBuilder.ok({ unregisteredElections });
+			return ResponseBuilder.ok({ elections: unregisteredElections });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public registerForElection: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const data: RegisterForElectionRequest = JSON.parse(event.body);
+
+		if (!data.electionId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election ID is missing');
+		if (!data.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'User ID is missing');
+
+		try {
+			const ballotPaperController: BallotPaperController = new BallotPaperController(this.unitOfWork);
+			const ballotPaper: BallotPaper = await ballotPaperController.createBallot(data.userId, data.electionId);
+
+			return ResponseBuilder.ok({ ballotPaper });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}

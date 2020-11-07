@@ -9,3 +9,8 @@ export interface UpdateElectionRequest {
 	election: Election;
 	adminId: string;
 }
+
+export interface RegisterForElectionRequest {
+	userId: string;
+	electionId: string;
+}

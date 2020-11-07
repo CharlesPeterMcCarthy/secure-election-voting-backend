@@ -103,20 +103,25 @@ export class BallotPaperController {
 		if (!data.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'User ID is missing');
 
 		try {
-			const election: Election = await this.unitOfWork.Elections.get(data.electionId);
-
-			const partialBallotPaper: Partial<BallotPaper> = {
-				...data,
-				candidates: election.candidates
-			};
-
-			const ballotPaper: BallotPaper = await this.unitOfWork.BallotPapers.create(partialBallotPaper);
+			const ballotPaper: BallotPaper = await this.createBallot(data.userId, data.electionId);
 
 			return ResponseBuilder.ok({ ballotPaper });
 		} catch (err) {
 			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Election not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
+	}
+
+	public createBallot = async (userId: string, electionId: string): Promise<BallotPaper> => {
+		const election: Election = await this.unitOfWork.Elections.get(electionId);
+
+		const partialBallotPaper: Partial<BallotPaper> = {
+			userId,
+			electionId,
+			candidates: election.candidates
+		};
+
+		return this.unitOfWork.BallotPapers.create(partialBallotPaper);
 	}
 
 }

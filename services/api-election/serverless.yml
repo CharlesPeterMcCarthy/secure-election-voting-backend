@@ -58,6 +58,13 @@ functions:
           path: /election/all-unregistered/{userId}
           method: get
           cors: true
+  registerForElection:
+    handler: src/handler.registerForElection
+    events:
+      - http:
+          path: /election/register
+          method: post
+          cors: true
   createElection:
     handler: src/handler.createElection
     events:
