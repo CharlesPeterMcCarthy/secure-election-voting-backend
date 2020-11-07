@@ -51,7 +51,7 @@ functions:
           path: /candidate/all
           method: get
           cors: true
-  getAllCandidatesByElection:
+  getAllByElection:
     handler: src/handler.getAllCandidatesByElection
     events:
       - http:

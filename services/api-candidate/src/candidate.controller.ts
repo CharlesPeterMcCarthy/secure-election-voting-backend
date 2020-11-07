@@ -6,7 +6,7 @@ import {
 	ApiEvent,
 	ApiContext,
 	UnitOfWork,
-	Candidate
+	Candidate, Election, CandidateDetails
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
 import { CreateCandidateRequest, UpdateCandidateRequest } from './candidate.interfaces';
@@ -82,7 +82,19 @@ export class CandidateController {
 		};
 
 		try {
+			const election: Election = await this.unitOfWork.Elections.get(partialCandidate.electionId);
 			const candidate: Candidate = await this.unitOfWork.Candidates.create(partialCandidate);
+
+			const candidateDetails: CandidateDetails = {
+				candidateId: candidate.candidateId,
+				electionId: candidate.electionId,
+				firstName: candidate.firstName,
+				lastName: candidate.lastName,
+				party: candidate.party
+			};
+			election.candidates = [ ...election.candidates, candidateDetails ];
+
+			await this.unitOfWork.Elections.update(election);
 
 			return ResponseBuilder.ok({ candidate });
 		} catch (err) {
@@ -119,7 +131,16 @@ export class CandidateController {
 		const electionId: string = event.pathParameters.electionId;
 
 		try {
+			const election: Election = await this.unitOfWork.Elections.get(electionId);
 			const candidate: Candidate = await this.unitOfWork.Candidates.delete(candidateId, electionId);
+
+			const candidateIndex: number = election.candidates.map((c: Candidate) => c.candidateId).indexOf(candidateId);
+			if (candidateIndex > -1) {
+				election.candidates.splice(candidateIndex, 1);
+
+				// election.candidates = updatedCandidates;
+				await this.unitOfWork.Elections.update(election);
+			}
 
 			return ResponseBuilder.ok({ candidate });
 		} catch (err) {
