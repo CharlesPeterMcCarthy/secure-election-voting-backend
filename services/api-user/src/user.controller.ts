@@ -35,6 +35,24 @@ export class UserController {
 		}
 	}
 
+	public getUserByEmail: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.email)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const email: string = event.pathParameters.email;
+
+		try {
+			const result: User = await this.unitOfWork.Users.getByEmail(email);
+
+			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve User');
+
+			return ResponseBuilder.ok({ user: result });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'User not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public getAllVoters: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		let lastEvaluatedKey: LastEvaluatedKey;
 		if (event.body) lastEvaluatedKey = JSON.parse(event.body) as LastEvaluatedKey;

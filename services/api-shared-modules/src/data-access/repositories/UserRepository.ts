@@ -1,5 +1,5 @@
 import { UserItem } from '../../models/core';
-import { QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
+import { QueryIterator, QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
 import { Repository } from './Repository';
 import { IUserRepository, QueryKey } from '../interfaces';
 import { LastEvaluatedKey, User, UserType } from '../../types';
@@ -37,6 +37,24 @@ export class UserRepository extends Repository implements IUserRepository {
 		}));
 	}
 
+	public async getByEmail(email: string): Promise<User> {
+		const keyCondition: QueryKey = {
+			entity: 'user',
+			sk3: `email#${email}`
+		};
+
+		const queryOptions: QueryOptions = {
+			indexName: 'entity-sk3-index'
+		};
+
+		const queryIterator: QueryIterator<UserItem> = this.db.query(UserItem, keyCondition, queryOptions);
+		const users: User[] = [];
+
+		for await (const user of queryIterator) users.push(user);
+
+		return users[0];
+	}
+
 	public async create(toCreate: Partial<User>): Promise<User> {
 		const userId: string = uuid();
 		const date: string = new Date().toISOString();
@@ -45,6 +63,7 @@ export class UserRepository extends Repository implements IUserRepository {
 			pk: `user#${userId}`,
 			sk: `user#${userId}`,
 			sk2: `userType#${toCreate.userType}`,
+			sk3: `email#${toCreate.email}`,
 			entity: 'user',
 			userId,
 			confirmed: true,

@@ -44,6 +44,13 @@ functions:
           path: /user/{userId}
           method: get
           cors: true
+  getUserByEmail:
+    handler: src/handler.getUserByEmail
+    events:
+      - http:
+          path: /user/by-email/{email}
+          method: get
+          cors: true
   getAllVoters:
     handler: src/handler.getAllVoters
     events:
