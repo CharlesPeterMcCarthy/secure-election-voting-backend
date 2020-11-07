@@ -115,7 +115,23 @@ export class CandidateController {
 		const updatedCandidate: Candidate = data;
 
 		try {
+			const election: Election = await this.unitOfWork.Elections.get(updatedCandidate.electionId);
 			const candidate: Candidate = await this.unitOfWork.Candidates.update(updatedCandidate);
+
+			const candidateDetails: CandidateDetails = {
+				candidateId: candidate.candidateId,
+				electionId: candidate.electionId,
+				firstName: candidate.firstName,
+				lastName: candidate.lastName,
+				party: candidate.party
+			};
+
+			const candidateIndex: number = election.candidates.map((c: Candidate) => c.candidateId).indexOf(updatedCandidate.candidateId);
+			if (candidateIndex > -1) {
+				election.candidates[candidateIndex] = candidateDetails;
+
+				await this.unitOfWork.Elections.update(election);
+			}
 
 			return ResponseBuilder.ok({ candidate });
 		} catch (err) {
