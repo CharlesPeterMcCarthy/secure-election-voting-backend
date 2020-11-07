@@ -4,7 +4,7 @@ import { BallotPaper, LastEvaluatedKey } from '../../types';
 import { Repository } from './Repository';
 import { v4 as uuid } from 'uuid';
 import { BallotPaperItem } from '../../models/core/BallotPaper';
-import { ConditionExpression, EqualityExpressionPredicate, equals } from '@aws/dynamodb-expressions';
+import { beginsWith, ConditionExpression, EqualityExpressionPredicate, equals } from '@aws/dynamodb-expressions';
 
 export class BallotPaperRepository extends Repository implements IBallotPaperRepository {
 
@@ -20,6 +20,37 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 			startKey: lastEvaluatedKey,
 			limit: 10
 		};
+
+		const queryPages: QueryPaginator<BallotPaperItem> = this.db.query(BallotPaperItem, keyCondition, queryOptions).pages();
+		const ballotPapers: BallotPaper[] = [];
+		for await (const page of queryPages) for (const ballotPaper of page) ballotPapers.push(ballotPaper);
+		return {
+			ballotPapers,
+			lastEvaluatedKey: queryPages.lastEvaluatedKey ? queryPages.lastEvaluatedKey : undefined
+		};
+	}
+
+	public async getAllByVoter(userId: string, voted?: boolean, lastEvaluatedKey?: LastEvaluatedKey):
+		Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }> {
+		const predicate: EqualityExpressionPredicate = equals(voted);
+
+		const equalsExpression: ConditionExpression = {
+			...predicate,
+			subject: 'voted'
+		};
+
+		const keyCondition: QueryKey = {
+			entity: 'ballotPaper',
+			sk3: beginsWith(`user#${userId}`)
+		};
+		const queryOptions: QueryOptions = {
+			indexName: 'entity-sk3-index',
+			scanIndexForward: false,
+			startKey: lastEvaluatedKey,
+			limit: 10
+		};
+
+		if (voted !== undefined) queryOptions.filter = equalsExpression;
 
 		const queryPages: QueryPaginator<BallotPaperItem> = this.db.query(BallotPaperItem, keyCondition, queryOptions).pages();
 		const ballotPapers: BallotPaper[] = [];
@@ -94,6 +125,7 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 		const date: string = new Date().toISOString();
 
 		ballotPaper.ballotPaperId = ballotPaperId;
+		ballotPaper.voted = false;
 
 		return this.db.put(Object.assign(new BallotPaperItem(), {
 			pk: `ballotPaper#${ballotPaper.ballotPaperId}`,

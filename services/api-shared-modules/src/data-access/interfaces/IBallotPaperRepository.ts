@@ -6,6 +6,8 @@ export interface IBallotPaperRepository {
 		LastEvaluatedKey): Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }>;
 	getAllByElectionVoter(userId: string, electionId: string, lastEvaluatedKey?:
 		LastEvaluatedKey): Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }>;
+	getAllByVoter(userId: string, voted?: boolean, lastEvaluatedKey?:
+		LastEvaluatedKey): Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }>;
 	getAllByElectionCandidate(electionId: string, candidateId: string, lastEvaluatedKey?:
 		LastEvaluatedKey): Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }>;
 	create(ballotPaper: Partial<BallotPaper>): Promise<BallotPaper>;

@@ -7,7 +7,7 @@ import {
 	ApiContext,
 	UnitOfWork,
 	LastEvaluatedKey,
-	Election
+	Election, BallotPaper
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
 import { CreateElectionRequest, UpdateElectionRequest } from './election.interfaces';
@@ -38,10 +38,29 @@ export class ElectionController {
 
 		try {
 			const result: { elections: Election[]; lastEvaluatedKey: Partial<ElectionItem> } =
-				await this.unitOfWork.Elections.getAll(lastEvaluatedKey);
+				await this.unitOfWork.Elections.getAll(undefined, lastEvaluatedKey);
 			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Elections');
 
 			return ResponseBuilder.ok({ ...result });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public getAllElectionsUnregisteredByUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.userId)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - User ID is missing');
+
+		const userId: string = event.pathParameters.userId;
+
+		try {
+			const electionsResponse: { elections: Election[] } = await this.unitOfWork.Elections.getAll(false);
+			const ballotPapersResponse: { ballotPapers: BallotPaper[] } = await this.unitOfWork.BallotPapers.getAllByVoter(userId);
+			const ballotPaperElectionIds: string[] = ballotPapersResponse.ballotPapers.map((bp: BallotPaper) => bp.electionId);
+			const unregisteredElections: Election[] =
+				electionsResponse.elections.filter((e: Election) => !ballotPaperElectionIds.includes(e.electionId));
+
+			return ResponseBuilder.ok({ unregisteredElections });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}

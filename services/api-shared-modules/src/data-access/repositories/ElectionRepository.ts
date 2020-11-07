@@ -4,6 +4,7 @@ import { Election, LastEvaluatedKey } from '../../types';
 import { Repository } from './Repository';
 import { v4 as uuid } from 'uuid';
 import { ElectionItem } from '../../models/core/Election';
+import { ConditionExpression, EqualityExpressionPredicate, equals } from '@aws/dynamodb-expressions';
 
 export class ElectionRepository extends Repository implements IElectionRepository {
 
@@ -14,7 +15,15 @@ export class ElectionRepository extends Repository implements IElectionRepositor
 		}));
 	}
 
-	public async getAll(lastEvaluatedKey?: LastEvaluatedKey): Promise<{ elections: Election[]; lastEvaluatedKey: LastEvaluatedKey }> {
+	public async getAll(electionFinished?: boolean, lastEvaluatedKey?: LastEvaluatedKey):
+		Promise<{ elections: Election[]; lastEvaluatedKey: LastEvaluatedKey }> {
+		const predicate: EqualityExpressionPredicate = equals(electionFinished);
+
+		const equalsExpression: ConditionExpression = {
+			...predicate,
+			subject: 'electionFinished'
+		};
+
 		const keyCondition: QueryKey = {
 			entity: 'election'
 		};
@@ -24,6 +33,8 @@ export class ElectionRepository extends Repository implements IElectionRepositor
 			startKey: lastEvaluatedKey,
 			limit: 10
 		};
+
+		if (electionFinished !== undefined) queryOptions.filter = equalsExpression;
 
 		const queryPages: QueryPaginator<ElectionItem> = this.db.query(ElectionItem, keyCondition, queryOptions).pages();
 		const elections: Election[] = [];
@@ -39,6 +50,7 @@ export class ElectionRepository extends Repository implements IElectionRepositor
 		const date: string = new Date().toISOString();
 
 		election.electionId = electionId;
+		election.electionFinished = false;
 
 		return this.db.put(Object.assign(new ElectionItem(), {
 			pk: `election#${election.electionId}`,

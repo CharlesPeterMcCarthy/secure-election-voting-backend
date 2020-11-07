@@ -50,6 +50,7 @@ export interface BallotPaper extends DBItem {
 	electionId: string;
 	userId: string;
 	candidates: CandidateDetails[];
+	voted: boolean;
 	vote?: CandidateDetails;
 	voteCandidateId?: string;
 	times: {
@@ -68,6 +69,7 @@ export interface Election extends DBItem {
 	};
 	candidates: CandidateDetails[];
 	winner?: CandidateDetails;
+	electionFinished: boolean;
 	times: {
 		createdAt: string;
 		startedAt?: string;

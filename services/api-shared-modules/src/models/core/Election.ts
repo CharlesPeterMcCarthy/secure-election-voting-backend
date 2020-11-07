@@ -21,7 +21,10 @@ export class ElectionItem extends DynamoDbItem implements Election {
 	public candidates!: CandidateDetails[];
 
 	@attribute()
-	public winner!: CandidateDetails;
+	public winner?: CandidateDetails;
+
+	@attribute()
+	public electionFinished!: boolean;
 
 	@attribute()
 	public times: {
