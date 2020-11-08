@@ -2,7 +2,7 @@ import { Election, LastEvaluatedKey } from '../..';
 
 export interface IElectionRepository {
 	get(electionId: string): Promise<Election>;
-	getAll(electionFinished?: boolean, lastEvaluatedKey?: LastEvaluatedKey):
+	getAll(electionStarted?: boolean, electionFinished?: boolean, lastEvaluatedKey?: LastEvaluatedKey):
 		Promise<{ elections: Election[]; lastEvaluatedKey: LastEvaluatedKey }>;
 	create(election: Partial<Election>): Promise<Election>;
 	update(election: Election): Promise<Election>;

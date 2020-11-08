@@ -2,7 +2,7 @@ import { Election } from '../../api-shared-modules/src/types';
 
 export interface CreateElectionRequest {
 	electionName: string;
-	adminId: string;
+	userId: string;
 }
 
 export interface UpdateElectionRequest {

@@ -4,7 +4,7 @@ import { Election, LastEvaluatedKey } from '../../types';
 import { Repository } from './Repository';
 import { v4 as uuid } from 'uuid';
 import { ElectionItem } from '../../models/core/Election';
-import { ConditionExpression, EqualityExpressionPredicate, equals } from '@aws/dynamodb-expressions';
+import {AndExpression, ConditionExpression, EqualityExpressionPredicate, equals} from '@aws/dynamodb-expressions';
 
 export class ElectionRepository extends Repository implements IElectionRepository {
 
@@ -15,17 +15,29 @@ export class ElectionRepository extends Repository implements IElectionRepositor
 		}));
 	}
 
-	public async getAll(electionFinished?: boolean, lastEvaluatedKey?: LastEvaluatedKey):
+	public async getAll(electionStarted?: boolean, electionFinished?: boolean, lastEvaluatedKey?: LastEvaluatedKey):
 		Promise<{ elections: Election[]; lastEvaluatedKey: LastEvaluatedKey }> {
-		const predicate: EqualityExpressionPredicate = equals(electionFinished);
+		const startedPredicate: EqualityExpressionPredicate = equals(electionStarted);
+		const finishedPredicate: EqualityExpressionPredicate = equals(electionFinished);
 
-		const equalsExpression: ConditionExpression = {
-			...predicate,
+		const startedExpression: ConditionExpression = {
+			...startedPredicate,
+			subject: 'electionStarted'
+		};
+		const finishedExpression: ConditionExpression = {
+			...finishedPredicate,
 			subject: 'electionFinished'
 		};
 
 		const keyCondition: QueryKey = {
 			entity: 'election'
+		};
+		const andExpression: AndExpression = {
+			type: 'And',
+			conditions : [
+				startedExpression,
+				finishedExpression
+			]
 		};
 		const queryOptions: QueryOptions = {
 			indexName: 'entity-sk-index',
@@ -34,7 +46,7 @@ export class ElectionRepository extends Repository implements IElectionRepositor
 			limit: 10
 		};
 
-		if (electionFinished !== undefined) queryOptions.filter = equalsExpression;
+		if (electionFinished !== undefined || electionStarted !== undefined) queryOptions.filter = andExpression;
 
 		const queryPages: QueryPaginator<ElectionItem> = this.db.query(ElectionItem, keyCondition, queryOptions).pages();
 		const elections: Election[] = [];

@@ -65,6 +65,13 @@ functions:
           path: /election/finished
           method: get
           cors: true
+  getCurrentElections:
+    handler: src/handler.getCurrentElections
+    events:
+      - http:
+          path: /election/current
+          method: get
+          cors: true
   getElecUnregByUser:
     handler: src/handler.getAllElectionsUnregisteredByUser
     events:
@@ -85,6 +92,20 @@ functions:
       - http:
           path: /election/register
           method: post
+          cors: true
+  startElection:
+    handler: src/handler.startElection
+    events:
+      - http:
+          path: /election/start/{electionId}
+          method: put
+          cors: true
+  finishElection:
+    handler: src/handler.finishElection
+    events:
+      - http:
+          path: /election/finish/{electionId}
+          method: put
           cors: true
   createElection:
     handler: src/handler.createElection
