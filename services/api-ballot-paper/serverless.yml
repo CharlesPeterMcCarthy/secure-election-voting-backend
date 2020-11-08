@@ -51,7 +51,7 @@ functions:
           path: /ballot/election/{electionId}
           method: get
           cors: true
-  getBallotPaperByElectionVoter:
+  getBallotPaperByVoter:
     handler: src/handler.getBallotPaperByElectionVoter
     events:
       - http:
@@ -71,4 +71,11 @@ functions:
       - http:
           path: /ballot
           method: post
+          cors: true
+  submitBallotPaper:
+    handler: src/handler.submitBallotPaper
+    events:
+      - http:
+          path: /ballot/submit
+          method: put
           cors: true

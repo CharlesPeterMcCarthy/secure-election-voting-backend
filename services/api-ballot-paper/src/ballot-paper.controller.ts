@@ -6,10 +6,10 @@ import {
 	ApiEvent,
 	ApiContext,
 	UnitOfWork,
-	Election, BallotPaper
+	Election, BallotPaper, Candidate
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
-import { CreateBallotPaperRequest } from './ballot-paper.interfaces';
+import {CreateBallotPaperRequest, SubmitBallotPaperRequest} from './ballot-paper.interfaces';
 
 export class BallotPaperController {
 
@@ -89,6 +89,41 @@ export class BallotPaperController {
 
 			return ResponseBuilder.ok({ ...result });
 		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public submitBallotPaper: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const data: SubmitBallotPaperRequest = JSON.parse(event.body);
+
+		if (!data.ballotPaper) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Ballot Paper is missing');
+		if (!data.candidate) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Selected Candidate is missing');
+		if (!data.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Selected Candidate is missing');
+
+		const { ballotPaper, candidate, userId }: SubmitBallotPaperRequest = data;
+
+		try {
+			const bp: BallotPaper = await this.unitOfWork.BallotPapers.get(ballotPaper.ballotPaperId, userId);
+			const c: Candidate = await this.unitOfWork.Candidates.get(candidate.candidateId, ballotPaper.electionId);
+
+			bp.times.submittedVoteAt = new Date().toISOString();
+			bp.voted = true;
+			bp.voteCandidateId = c.candidateId;
+			bp.vote = {
+				candidateId: c.candidateId,
+				electionId: c.electionId,
+				firstName: c.firstName,
+				lastName: c.lastName,
+				party: c.party
+			};
+
+			const updatedBallotPaper: BallotPaper = await this.unitOfWork.BallotPapers.update(bp);
+
+			return ResponseBuilder.ok({ ballotPaper: updatedBallotPaper });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Election not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

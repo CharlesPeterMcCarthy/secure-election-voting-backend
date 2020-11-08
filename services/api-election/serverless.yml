@@ -100,6 +100,13 @@ functions:
           path: /election/unregister
           method: put
           cors: true
+  getNonVotedElections:
+    handler: src/handler.getNonVotedElections
+    events:
+      - http:
+          path: /election/non-voted/{userId}
+          method: get
+          cors: true
   startElection:
     handler: src/handler.startElection
     events:

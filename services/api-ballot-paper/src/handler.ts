@@ -9,3 +9,4 @@ export const getAllBallotPapersByElection: ApiHandler = controller.getAllBallotP
 export const getBallotPaperByElectionVoter: ApiHandler = controller.getBallotPaperByElectionVoter;
 export const getAllBallotPapersByCandidate: ApiHandler = controller.getAllBallotPapersByCandidate;
 export const createBallotPaper: ApiHandler = controller.createBallotPaper;
+export const submitBallotPaper: ApiHandler = controller.submitBallotPaper;

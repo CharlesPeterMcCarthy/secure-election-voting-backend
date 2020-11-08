@@ -173,6 +173,27 @@ export class ElectionController {
 		}
 	}
 
+	public getNonVotedElections: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.userId)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const userId: string = event.pathParameters.userId;
+
+		try {
+			const electionsResponse: { elections: Election[] } = await this.unitOfWork.Elections.getAll(true, false);
+			const ballotPapersResponse: { ballotPapers: BallotPaper[] } = await this.unitOfWork.BallotPapers.getAllByVoter(userId, false);
+			const ballotPaperElectionIds: string[] = ballotPapersResponse.ballotPapers
+				.filter((bp: BallotPaper) => !bp.voted)
+				.map((bp: BallotPaper) => bp.electionId);
+			const nonVotedElections: Election[] =
+				electionsResponse.elections.filter((e: Election) => ballotPaperElectionIds.includes(e.electionId));
+
+			return ResponseBuilder.ok({ elections: nonVotedElections });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public startElection: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.pathParameters || !event.pathParameters.electionId)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - Election ID is missing');
