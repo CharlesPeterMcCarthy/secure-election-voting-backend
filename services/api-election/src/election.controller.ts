@@ -7,7 +7,7 @@ import {
 	ApiContext,
 	UnitOfWork,
 	LastEvaluatedKey,
-	Election, BallotPaper, User
+	Election, BallotPaper, User, CandidateDetails
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
 import {CreateElectionRequest, RegisterForElectionRequest, UpdateElectionRequest} from './election.interfaces';
@@ -194,6 +194,22 @@ export class ElectionController {
 		}
 	}
 
+	public getElectionResults: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.electionId)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const electionId: string = event.pathParameters.electionId;
+
+		try {
+			// Check this election has finished and has winner
+			const election: Election = await this.unitOfWork.Elections.get(electionId);
+
+			return ResponseBuilder.ok({ election });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public startElection: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.pathParameters || !event.pathParameters.electionId)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - Election ID is missing');
@@ -220,6 +236,26 @@ export class ElectionController {
 		try {
 			const election: Election = await this.unitOfWork.Elections.get(electionId);
 			election.electionFinished = true;
+
+			const ballots: BallotPaper[] = (await this.unitOfWork.BallotPapers.getAllByElection(electionId)).ballotPapers;
+			const candidateCounts: { [candidateId: string]: number } = { };
+
+			election.candidates.map((cd: CandidateDetails) => {
+				candidateCounts[cd.candidateId] = ballots.filter((b: BallotPaper) => b.voteCandidateId === cd.candidateId).length;
+			}); // Store these values in election item?
+
+			let highest: { candidateId: string; count: number };
+
+			Object.keys(candidateCounts).forEach((c: any) => {
+				if (!highest) highest = { candidateId: c, count: candidateCounts[c] };
+				else {
+					if (candidateCounts[c] > highest.count) highest = { candidateId: c, count: candidateCounts[c] };
+				}
+			});
+
+			const winner: CandidateDetails = election.candidates.find((c: CandidateDetails) => c.candidateId === highest.candidateId);
+			election.winner = winner;
+
 			const updatedElection: Election = await this.unitOfWork.Elections.update(election);
 
 			return ResponseBuilder.ok({ election: updatedElection });
@@ -271,7 +307,7 @@ export class ElectionController {
 
 			return ResponseBuilder.ok({ election });
 		} catch (err) {
-			console.log(err)
+			console.log(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

@@ -107,6 +107,13 @@ functions:
           path: /election/non-voted/{userId}
           method: get
           cors: true
+  getElectionResults:
+    handler: src/handler.getElectionResults
+    events:
+      - http:
+          path: /election/results/{electionId}
+          method: get
+          cors: true
   startElection:
     handler: src/handler.startElection
     events:
