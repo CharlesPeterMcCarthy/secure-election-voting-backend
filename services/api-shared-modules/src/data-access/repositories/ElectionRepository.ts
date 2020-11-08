@@ -50,6 +50,7 @@ export class ElectionRepository extends Repository implements IElectionRepositor
 		const date: string = new Date().toISOString();
 
 		election.electionId = electionId;
+		election.electionStarted = false;
 		election.electionFinished = false;
 
 		return this.db.put(Object.assign(new ElectionItem(), {

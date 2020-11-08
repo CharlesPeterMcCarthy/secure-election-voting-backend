@@ -51,6 +51,20 @@ functions:
           path: /election/all
           method: get
           cors: true
+  getAllUpcomingElections:
+    handler: src/handler.getAllUpcomingElections
+    events:
+      - http:
+          path: /election/upcoming
+          method: get
+          cors: true
+  getAllFinishedElections:
+    handler: src/handler.getAllFinishedElections
+    events:
+      - http:
+          path: /election/finished
+          method: get
+          cors: true
   getElecUnregByUser:
     handler: src/handler.getAllElectionsUnregisteredByUser
     events:

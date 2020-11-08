@@ -69,6 +69,7 @@ export interface Election extends DBItem {
 	};
 	candidates: CandidateDetails[];
 	winner?: CandidateDetails;
+	electionStarted: boolean;
 	electionFinished: boolean;
 	times: {
 		createdAt: string;

@@ -48,6 +48,36 @@ export class ElectionController {
 		}
 	}
 
+	public getAllUpcomingElections: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		let lastEvaluatedKey: LastEvaluatedKey;
+		if (event.body) lastEvaluatedKey = JSON.parse(event.body) as LastEvaluatedKey;
+
+		try {
+			const result: { elections: Election[]; lastEvaluatedKey: Partial<ElectionItem> } =
+				await this.unitOfWork.Elections.getAll(false, lastEvaluatedKey);
+			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Elections');
+
+			return ResponseBuilder.ok({ ...result });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public getAllFinishedElections: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		let lastEvaluatedKey: LastEvaluatedKey;
+		if (event.body) lastEvaluatedKey = JSON.parse(event.body) as LastEvaluatedKey;
+
+		try {
+			const result: { elections: Election[]; lastEvaluatedKey: Partial<ElectionItem> } =
+				await this.unitOfWork.Elections.getAll(true, lastEvaluatedKey);
+			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Elections');
+
+			return ResponseBuilder.ok({ ...result });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public getAllElectionsUnregisteredByUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.pathParameters || !event.pathParameters.userId)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - User ID is missing');

@@ -154,7 +154,6 @@ export class CandidateController {
 			if (candidateIndex > -1) {
 				election.candidates.splice(candidateIndex, 1);
 
-				// election.candidates = updatedCandidates;
 				await this.unitOfWork.Elections.update(election);
 			}
 
