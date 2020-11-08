@@ -94,13 +94,16 @@ export class ElectionController {
 	}
 
 	public getAllElectionsUnregisteredByUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.pathParameters || !event.pathParameters.userId)
-			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - User ID is missing');
+		if (!event.pathParameters || !event.pathParameters.userId || !event.pathParameters.upcoming)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
 		const userId: string = event.pathParameters.userId;
+		const upcoming: boolean = event.pathParameters.upcoming === 'true';
 
 		try {
-			const electionsResponse: { elections: Election[] } = await this.unitOfWork.Elections.getAll(false);
+			const electionsResponse: { elections: Election[] } =
+				upcoming ? await this.unitOfWork.Elections.getAll(false, false) :
+				await this.unitOfWork.Elections.getAll(undefined, undefined);
 			const ballotPapersResponse: { ballotPapers: BallotPaper[] } = await this.unitOfWork.BallotPapers.getAllByVoter(userId);
 			const ballotPaperElectionIds: string[] = ballotPapersResponse.ballotPapers.map((bp: BallotPaper) => bp.electionId);
 			const unregisteredElections: Election[] =
@@ -113,13 +116,16 @@ export class ElectionController {
 	}
 
 	public getAllElectionsRegisteredByUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.pathParameters || !event.pathParameters.userId)
-			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters - User ID is missing');
+		if (!event.pathParameters || !event.pathParameters.userId || !event.pathParameters.upcoming)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
 		const userId: string = event.pathParameters.userId;
+		const upcoming: boolean = event.pathParameters.upcoming === 'true';
 
 		try {
-			const electionsResponse: { elections: Election[] } = await this.unitOfWork.Elections.getAll(false);
+			const electionsResponse: { elections: Election[] } =
+				upcoming ? await this.unitOfWork.Elections.getAll(false, false) :
+					await this.unitOfWork.Elections.getAll(undefined, undefined);
 			const ballotPapersResponse: { ballotPapers: BallotPaper[] } = await this.unitOfWork.BallotPapers.getAllByVoter(userId, false);
 			const ballotPaperElectionIds: string[] = ballotPapersResponse.ballotPapers.map((bp: BallotPaper) => bp.electionId);
 			const registeredElections: Election[] =
@@ -144,6 +150,24 @@ export class ElectionController {
 			const ballotPaper: BallotPaper = await ballotPaperController.createBallot(data.userId, data.electionId);
 
 			return ResponseBuilder.ok({ ballotPaper });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public unregisterForElection: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const data: RegisterForElectionRequest = JSON.parse(event.body);
+
+		if (!data.electionId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election ID is missing');
+		if (!data.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'User ID is missing');
+
+		try {
+			const ballotPaper: BallotPaper = await this.unitOfWork.BallotPapers.getByElectionVoter(data.userId, data.electionId);
+			const deletedBallotPaper: BallotPaper = await this.unitOfWork.BallotPapers.delete(ballotPaper.ballotPaperId, ballotPaper.userId);
+
+			return ResponseBuilder.ok({ ballotPaper: deletedBallotPaper });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -221,13 +245,12 @@ export class ElectionController {
 		if (!data.election) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election Details are missing');
 		if (!data.election.electionId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election ID is missing');
 
-		const updatedElection: Election = data.election;
-
 		try {
-			const election: Election = await this.unitOfWork.Elections.update(updatedElection);
+			const election: Election = await this.unitOfWork.Elections.update(data.election);
 
 			return ResponseBuilder.ok({ election });
 		} catch (err) {
+			console.log(err)
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

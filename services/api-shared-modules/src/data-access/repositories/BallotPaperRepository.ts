@@ -61,8 +61,7 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 		};
 	}
 
-	public async getAllByElectionVoter(userId: string, electionId: string, lastEvaluatedKey?: LastEvaluatedKey):
-		Promise<{ ballotPapers: BallotPaper[]; lastEvaluatedKey: LastEvaluatedKey }> {
+	public async getByElectionVoter(userId: string, electionId: string): Promise<BallotPaper> {
 		const keyCondition: QueryKey = {
 			entity: 'ballotPaper',
 			sk3: `user#${userId}/election#${electionId}`,
@@ -70,17 +69,14 @@ export class BallotPaperRepository extends Repository implements IBallotPaperRep
 		const queryOptions: QueryOptions = {
 			indexName: 'entity-sk3-index',
 			scanIndexForward: false,
-			startKey: lastEvaluatedKey,
+			// startKey: lastEvaluatedKey,
 			limit: 10
 		};
 
 		const queryPages: QueryPaginator<BallotPaperItem> = this.db.query(BallotPaperItem, keyCondition, queryOptions).pages();
 		const ballotPapers: BallotPaper[] = [];
 		for await (const page of queryPages) for (const ballotPaper of page) ballotPapers.push(ballotPaper);
-		return {
-			ballotPapers,
-			lastEvaluatedKey: queryPages.lastEvaluatedKey ? queryPages.lastEvaluatedKey : undefined
-		};
+		return ballotPapers[0];
 	}
 
 	public async getAllByElectionCandidate(electionId: string, candidateId: string, lastEvaluatedKey?: LastEvaluatedKey):

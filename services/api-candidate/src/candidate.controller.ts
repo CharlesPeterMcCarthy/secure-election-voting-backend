@@ -107,12 +107,13 @@ export class CandidateController {
 
 		const data: UpdateCandidateRequest = JSON.parse(event.body);
 
-		if (!data.electionId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election ID is missing');
-		if (!data.firstName) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate first name is missing');
-		if (!data.lastName) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate last name is missing');
-		if (!data.party) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate political party is missing');
+		if (!data.candidate) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate details are missing');
+		if (!data.candidate.electionId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Election ID is missing');
+		if (!data.candidate.firstName) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate first name is missing');
+		if (!data.candidate.lastName) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate last name is missing');
+		if (!data.candidate.party) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Candidate political party is missing');
 
-		const updatedCandidate: Candidate = data;
+		const updatedCandidate: Candidate = data.candidate;
 
 		try {
 			const election: Election = await this.unitOfWork.Elections.get(updatedCandidate.electionId);

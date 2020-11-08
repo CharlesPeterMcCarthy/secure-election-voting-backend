@@ -52,7 +52,7 @@ export class BallotPaperController {
 		}
 	}
 
-	public getAllBallotPapersByElectionVoter: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+	public getBallotPaperByElectionVoter: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.pathParameters || !event.pathParameters.electionId || !event.pathParameters.userId)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
@@ -63,11 +63,10 @@ export class BallotPaperController {
 		// if (event.body) lastEvaluatedKey = JSON.parse(event.body) as LastEvaluatedKey;
 
 		try {
-			const result: { ballotPapers: BallotPaper[]; lastEvaluatedKey: Partial<ElectionItem> } =
-				await this.unitOfWork.BallotPapers.getAllByElectionVoter(userId, electionId);
-			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Ballot Papers');
+			const ballotPaper: BallotPaper = await this.unitOfWork.BallotPapers.getByElectionVoter(userId, electionId);
+			if (!ballotPaper) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Ballot Paper');
 
-			return ResponseBuilder.ok({ ...result });
+			return ResponseBuilder.ok({ ballotPaper });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -118,6 +117,7 @@ export class BallotPaperController {
 		const partialBallotPaper: Partial<BallotPaper> = {
 			userId,
 			electionId,
+			electionName: election.electionName,
 			candidates: election.candidates
 		};
 

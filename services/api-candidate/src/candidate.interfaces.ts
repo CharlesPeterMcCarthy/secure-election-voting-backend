@@ -7,4 +7,6 @@ export interface CreateCandidateRequest {
 	party: string;
 }
 
-export interface UpdateCandidateRequest extends Candidate { }
+export interface UpdateCandidateRequest {
+	candidate: Candidate;
+}

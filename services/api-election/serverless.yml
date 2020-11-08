@@ -76,14 +76,14 @@ functions:
     handler: src/handler.getAllElectionsUnregisteredByUser
     events:
       - http:
-          path: /election/all-unregistered/{userId}
+          path: /election/unregistered/{userId}/{upcoming}
           method: get
           cors: true
   getElecRegByUser:
     handler: src/handler.getAllElectionsRegisteredByUser
     events:
       - http:
-          path: /election/all-registered/{userId}
+          path: /election/registered/{userId}/{upcoming}
           method: get
           cors: true
   registerForElection:
@@ -92,6 +92,13 @@ functions:
       - http:
           path: /election/register
           method: post
+          cors: true
+  unregisterForElection:
+    handler: src/handler.unregisterForElection
+    events:
+      - http:
+          path: /election/unregister
+          method: put
           cors: true
   startElection:
     handler: src/handler.startElection

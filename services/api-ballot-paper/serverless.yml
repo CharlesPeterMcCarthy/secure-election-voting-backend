@@ -51,8 +51,8 @@ functions:
           path: /ballot/election/{electionId}
           method: get
           cors: true
-  getBallotsByElectionVoter:
-    handler: src/handler.getAllBallotPapersByElectionVoter
+  getBallotPaperByElectionVoter:
+    handler: src/handler.getBallotPaperByElectionVoter
     events:
       - http:
           path: /ballot/voter/{electionId}/{userId}

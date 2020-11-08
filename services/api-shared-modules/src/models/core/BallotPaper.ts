@@ -14,6 +14,9 @@ export class BallotPaperItem extends DynamoDbItem implements BallotPaper {
 	public userId!: string;
 
 	@attribute()
+	public electionName!: string;
+
+	@attribute()
 	public candidates!: CandidateDetails[];
 
 	@attribute()
