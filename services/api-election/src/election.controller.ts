@@ -10,8 +10,8 @@ import {
 	Election, BallotPaper, User, CandidateDetails
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
-import {CreateElectionRequest, RegisterForElectionRequest, UpdateElectionRequest} from './election.interfaces';
-import {BallotPaperController} from "../../api-ballot-paper/src/ballot-paper.controller";
+import { CreateElectionRequest, RegisterForElectionRequest, UpdateElectionRequest } from './election.interfaces';
+import { BallotPaperController } from '../../api-ballot-paper/src/ballot-paper.controller';
 
 export class ElectionController {
 
