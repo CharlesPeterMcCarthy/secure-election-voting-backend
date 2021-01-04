@@ -173,6 +173,27 @@ export class ElectionController {
 		}
 	}
 
+	public getVotedElections: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.userId)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const userId: string = event.pathParameters.userId;
+
+		try {
+			const electionsResponse: { elections: Election[] } = await this.unitOfWork.Elections.getAll(undefined, undefined);
+			const ballotPapersResponse: { ballotPapers: BallotPaper[] } = await this.unitOfWork.BallotPapers.getAllByVoter(userId, true);
+			const ballotPaperElectionIds: string[] = ballotPapersResponse.ballotPapers
+				.filter((bp: BallotPaper) => bp.voted)
+				.map((bp: BallotPaper) => bp.electionId);
+			const votedElections: Election[] =
+				electionsResponse.elections.filter((e: Election) => ballotPaperElectionIds.includes(e.electionId));
+
+			return ResponseBuilder.ok({ elections: votedElections });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public getNonVotedElections: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.pathParameters || !event.pathParameters.userId)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');

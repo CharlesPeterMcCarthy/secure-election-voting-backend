@@ -9,7 +9,7 @@ import {
 	Election, BallotPaper, Candidate
 } from '../../api-shared-modules/src';
 import { ElectionItem } from '../../api-shared-modules/src/models/core/Election';
-import {CreateBallotPaperRequest, SubmitBallotPaperRequest} from './ballot-paper.interfaces';
+import { CreateBallotPaperRequest, SubmitBallotPaperRequest } from './ballot-paper.interfaces';
 
 export class BallotPaperController {
 

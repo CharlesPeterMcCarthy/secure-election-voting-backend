@@ -4,7 +4,7 @@ import { Election, LastEvaluatedKey } from '../../types';
 import { Repository } from './Repository';
 import { v4 as uuid } from 'uuid';
 import { ElectionItem } from '../../models/core/Election';
-import {AndExpression, ConditionExpression, EqualityExpressionPredicate, equals} from '@aws/dynamodb-expressions';
+import { AndExpression, ConditionExpression, EqualityExpressionPredicate, equals } from '@aws/dynamodb-expressions';
 
 export class ElectionRepository extends Repository implements IElectionRepository {
 

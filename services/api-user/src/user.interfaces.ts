@@ -4,6 +4,8 @@ export interface CreateVoterRequest {
 	firstName: string;
 	lastName: string;
 	email: string;
+	salt: string;
+	hashedPassword: string;
 	userType: UserType;
 }
 

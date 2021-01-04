@@ -13,6 +13,7 @@ export const getAllElectionsUnregisteredByUser: ApiHandler = controller.getAllEl
 export const getAllElectionsRegisteredByUser: ApiHandler = controller.getAllElectionsRegisteredByUser;
 export const registerForElection: ApiHandler = controller.registerForElection;
 export const unregisterForElection: ApiHandler = controller.unregisterForElection;
+export const getVotedElections: ApiHandler = controller.getVotedElections;
 export const getNonVotedElections: ApiHandler = controller.getNonVotedElections;
 export const getElectionResults: ApiHandler = controller.getElectionResults;
 export const startElection: ApiHandler = controller.startElection;

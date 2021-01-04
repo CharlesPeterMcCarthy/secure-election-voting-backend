@@ -74,9 +74,13 @@ export class UserController {
 
 		const data: CreateVoterRequest = JSON.parse(event.body);
 
+		console.log(data)
+
 		if (!data.firstName) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'First name is missing');
 		if (!data.lastName) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Last name is missing');
 		if (!data.email) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Email address is missing');
+		if (!data.salt) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Salt is missing');
+		if (!data.hashedPassword) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Hashed Password is missing');
 		if (!data.userType) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'User type is missing');
 		// Check if value in UserType enum
 
@@ -87,6 +91,7 @@ export class UserController {
 
 			return ResponseBuilder.ok({ user: result });
 		} catch (err) {
+			console.error(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

@@ -11,6 +11,12 @@ export class UserItem extends DynamoDbItem implements User {
 	public email!: string;
 
 	@attribute()
+	public salt!: string;
+
+	@attribute()
+	public hashedPassword!: string;
+
+	@attribute()
 	public firstName!: string;
 
 	@attribute()

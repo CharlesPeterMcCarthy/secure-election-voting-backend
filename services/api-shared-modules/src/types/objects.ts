@@ -24,6 +24,8 @@ export interface User extends DBItem {
 	firstName: string;
 	lastName: string;
 	email: string;
+	salt: string;
+	hashedPassword: string;
 	userType: UserType;
 	confirmed: boolean;
 	times: {
