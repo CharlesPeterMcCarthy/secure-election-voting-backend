@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { CandidateDetails, Election } from '../../types';
+import { CandidateDetails, Election, WinnerDetails } from '../../types';
 
 export class ElectionItem extends DynamoDbItem implements Election {
 
@@ -21,7 +21,7 @@ export class ElectionItem extends DynamoDbItem implements Election {
 	public candidates!: CandidateDetails[];
 
 	@attribute()
-	public winner?: CandidateDetails;
+	public winner?: WinnerDetails;
 
 	@attribute()
 	public electionStarted!: boolean;

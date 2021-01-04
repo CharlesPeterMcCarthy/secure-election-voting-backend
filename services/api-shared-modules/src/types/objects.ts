@@ -19,6 +19,11 @@ export interface CandidateDetails {
 	party: string;
 }
 
+export interface WinnerDetails extends CandidateDetails {
+	votesReceived: number;
+	percentageReceived: number;
+}
+
 export interface User extends DBItem {
 	userId: string;
 	firstName: string;
@@ -71,7 +76,7 @@ export interface Election extends DBItem {
 		lastName: string;
 	};
 	candidates: CandidateDetails[];
-	winner?: CandidateDetails;
+	winner?: WinnerDetails;
 	electionStarted: boolean;
 	electionFinished: boolean;
 	times: {

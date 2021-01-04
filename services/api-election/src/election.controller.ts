@@ -265,7 +265,7 @@ export class ElectionController {
 				candidateCounts[cd.candidateId] = ballots.filter((b: BallotPaper) => b.voteCandidateId === cd.candidateId).length;
 			}); // Store these values in election item?
 
-			let highest: { candidateId: string; count: number };
+			let highest: { candidateId: string; count: number } = { candidateId: '', count: 0 };
 
 			Object.keys(candidateCounts).forEach((c: any) => {
 				if (!highest) highest = { candidateId: c, count: candidateCounts[c] };
@@ -275,7 +275,11 @@ export class ElectionController {
 			});
 
 			const winner: CandidateDetails = election.candidates.find((c: CandidateDetails) => c.candidateId === highest.candidateId);
-			election.winner = winner;
+			election.winner = {
+				...winner,
+				votesReceived: highest.count,
+				percentageReceived: (100 / ballots.length) * highest.count
+			};
 
 			const updatedElection: Election = await this.unitOfWork.Elections.update(election);
 
